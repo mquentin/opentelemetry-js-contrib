@@ -27,6 +27,9 @@ export const ATTR_BROWSER_NAVIGATION_HASH_CHANGE =
   'browser.navigation.hash_change';
 export const ATTR_BROWSER_NAVIGATION_TYPE = 'browser.navigation.type';
 
+/**
+ * @deprecated Use NavigationInstrumentation from @opentelemetry/browser-instrumentation/experimental/navigation.
+ */
 export class BrowserNavigationInstrumentation extends InstrumentationBase<BrowserNavigationInstrumentationConfig> {
   applyCustomLogRecordData: ApplyCustomLogRecordDataFunction | undefined =
     undefined;

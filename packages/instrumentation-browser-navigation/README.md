@@ -3,12 +3,49 @@
 [![NPM Published Version][npm-img]][npm-url]
 [![Apache License][license-image]][license-image]
 
+> **Deprecated:** This instrumentation has moved to [`@opentelemetry/browser-instrumentation/experimental/navigation`](https://github.com/open-telemetry/opentelemetry-browser/tree/main/packages/instrumentation#navigation). Use `NavigationInstrumentation` from that package for new applications and follow the [migration steps](#migration) below for existing applications.
+
 This module provides automatic instrumentation for browser navigation in Web applications. It emits log records via the Logs API to represent:
 
 - **Page load** (hard navigation) - Initial page loads and full page refreshes
 - **Same-document navigations** (soft navigations) - History changes, back/forward navigation, and hash changes
 
 The instrumentation supports both traditional browser APIs and the modern [Navigation API](https://developer.mozilla.org/en-US/docs/Web/API/Navigation_API) when available for improved accuracy and reduced duplicate events.
+
+## Migration
+
+Replace the package dependency:
+
+```bash
+npm uninstall @opentelemetry/instrumentation-browser-navigation
+npm install --save @opentelemetry/browser-instrumentation
+```
+
+Change the import and class name from `BrowserNavigationInstrumentation` to `NavigationInstrumentation`. If you import the config type, rename `BrowserNavigationInstrumentationConfig` to `NavigationInstrumentationConfig`, imported from the same replacement export. The `applyCustomLogRecordData`, `useNavigationApiIfAvailable` and `sanitizeUrl` options are unchanged, and `sanitizeUrl` still fully replaces the default URL redaction.
+
+Before:
+
+```typescript
+import { BrowserNavigationInstrumentation } from '@opentelemetry/instrumentation-browser-navigation';
+
+new BrowserNavigationInstrumentation({ sanitizeUrl });
+```
+
+After:
+
+```typescript
+import { NavigationInstrumentation } from '@opentelemetry/browser-instrumentation/experimental/navigation';
+
+new NavigationInstrumentation({ sanitizeUrl });
+```
+
+The instrumentation scope name changes from `@opentelemetry/instrumentation-browser-navigation` to `@opentelemetry/browser-instrumentation/navigation`. Update queries, dashboards and filters that select logs by instrumentation scope name.
+
+The replacement is not registered with `registerInstrumentations()`. Pass it to the browser SDK's `instrumentations` option or call `enable()` on it yourself, and note that it has no `enabled` config option. `applyCustomLogRecordData` is deprecated in the replacement in favor of a custom `LogRecordProcessor`.
+
+Keep your OpenTelemetry Logs SDK setup and logger provider. The replacement still emits `browser.navigation` log records for hard and soft navigations with the same attributes. Register only the replacement navigation instrumentation to avoid recording the same navigation twice.
+
+See the browser [migration guide](https://github.com/open-telemetry/opentelemetry-browser/blob/main/docs/migration-guide.md#navigation-and-exceptions) for more detail.
 
 ## Log Record Structure
 
